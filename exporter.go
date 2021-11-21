@@ -39,22 +39,36 @@ func main() {
 
 	query := fmt.Sprintf(`
 					SELECT ContentID, ChapterProgress, Text FROM Bookmark
-					WHERE VolumeID="%s"
+					WHERE VolumeID=?
 					ORDER BY ContentID, ChapterProgress
-					LIMIT 1`, *bookIDPtr)
+					LIMIT 1000`)
 
-	rows, err = db.Query(query)
+	rows, err = db.Query(query, *bookIDPtr)
 	checkErr(err)
 	defer rows.Close()
 
-	var volumeID string
+	currentChapterTitle := ""
 	var contentID string
+	var chapterProgress string
 	var text sql.NullString
 	for rows.Next() {
-		err = rows.Scan(&volumeID, &contentID, &text)
+		err = rows.Scan(&contentID, &chapterProgress, &text)
 		checkErr(err)
 
 		if text.Valid {
+			// get chapter title
+			row := db.QueryRow("SELECT Title FROM content WHERE ContentID=?", contentID)
+			checkErr(err)
+			var chapterTitle string
+			err = row.Scan(&chapterTitle)
+			checkErr(err)
+			if chapterTitle != currentChapterTitle {
+				fmt.Println("=====")
+				fmt.Println(chapterTitle)
+				fmt.Println("=====")
+				currentChapterTitle = chapterTitle
+			}
+
 			trimmedText := strings.Join(strings.Fields(text.String), " ")
 			fmt.Println(trimmedText)
 			fmt.Println("")
