@@ -38,9 +38,9 @@ func main() {
 	// to get chapter title, we need to go from bookmarks.contentid to content.contentid, then find the item with the next VolumeIndex. The Title of that row is the chapter title.
 
 	query := fmt.Sprintf(`
-					SELECT ContentID, ChapterProgress, Text FROM Bookmark
+					SELECT ContentID, Text FROM Bookmark
 					WHERE VolumeID=?
-					ORDER BY ContentID, ChapterProgress
+					ORDER BY ContentID, ChapterProgress, StartContainerPath
 					LIMIT 1000`)
 
 	rows, err = db.Query(query, *bookIDPtr)
@@ -49,10 +49,9 @@ func main() {
 
 	currentChapterTitle := ""
 	var contentID string
-	var chapterProgress string
 	var text sql.NullString
 	for rows.Next() {
-		err = rows.Scan(&contentID, &chapterProgress, &text)
+		err = rows.Scan(&contentID, &text)
 		checkErr(err)
 
 		if text.Valid {
