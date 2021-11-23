@@ -1,2 +1,4 @@
+github.com/kapmahc/epub v0.1.1 h1:a4fgmhh/q2vyzFR2QXOVohR2zAuQvbacCjMZ1LGr0lw=
+github.com/kapmahc/epub v0.1.1/go.mod h1:UpnUbQO78vpmp6TC4emDTAIG6XVcdnZTnaTx06qbtYM=
 github.com/mattn/go-sqlite3 v1.14.9 h1:10HX2Td0ocZpYEjhilsuo6WWtUqttj2Kb0KtD86/KYA=
 github.com/mattn/go-sqlite3 v1.14.9/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=

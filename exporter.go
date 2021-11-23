@@ -4,12 +4,33 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"strings"
 
+	"github.com/kapmahc/epub"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
+	bk, err := epub.Open("../kepub_test.epub")
+	checkErr(err)
+	defer bk.Close()
+
+	for _, v := range bk.Files() {
+		fmt.Println(v)
+	}
+	chapter, err := bk.Open("ch06.html")
+	checkErr(err)
+	defer chapter.Close()
+
+	content, err := ioutil.ReadAll(chapter)
+	checkErr(err)
+
+	fmt.Println(string(content))
+
+	os.Exit(0)
+
 	db, err := sql.Open("sqlite3", "../KoboReader.sqlite")
 	checkErr(err)
 
@@ -37,11 +58,10 @@ func main() {
 
 	// to get chapter title, we need to go from bookmarks.contentid to content.contentid, then find the item with the next VolumeIndex. The Title of that row is the chapter title.
 
-	query := fmt.Sprintf(`
-					SELECT ContentID, Text FROM Bookmark
-					WHERE VolumeID=?
-					ORDER BY ContentID, ChapterProgress, StartContainerPath
-					LIMIT 1000`)
+	query := `SELECT ContentID, Text FROM Bookmark
+				WHERE VolumeID=?
+				ORDER BY ContentID, ChapterProgress, StartContainerPath
+				LIMIT 1000`
 
 	rows, err = db.Query(query, *bookIDPtr)
 	checkErr(err)
